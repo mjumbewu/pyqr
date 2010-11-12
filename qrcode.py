@@ -442,6 +442,7 @@ except NameError:
 
     def bin(n):
         """
+        From http://code.activestate.com/recipes/576847/
         A foolishly simple look-up method of getting binary string from an integer
         This happens to be faster than all other ways!!!
         """
