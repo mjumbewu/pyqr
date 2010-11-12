@@ -450,7 +450,7 @@ except NameError:
         # create hex of int, remove '0x'. now for each hex char,
         # look up binary string, append in list and join at the end.
         # =========================================================
-        return ''.join([hexDict[hstr] for hstr in hex(n)[2:]])
+        return '0b' + (''.join([hexDict[hstr] for hstr in hex(n)[2:]])).lstrip('0')
 
 def bitlist(i, l):
     """
