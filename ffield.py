@@ -142,7 +142,7 @@ class FField:
     See documentation on the appropriate method for further details.
     """
 
-    def __init__(self,n,gen=0,useLUT=-1):
+    def __init__(self,n,gen=0,useLUT=0):
         """
         This method constructs the field GF(2^p).  It takes one
         required argument, n = p, and two optional arguments, gen,
