@@ -393,6 +393,41 @@ class QRCode(object):
         img = Image.new('RGB', (s, s), off)
         img.putdata([on if x==1 else off for x in self.matrix.to_list()])
         return img.resize((module_width*s, module_width*s))
+    
+    def to_svg(self, scale=6, on='black', off='white'):
+        w = h = self.size
+        ver = self.version
+        ecl = {0:'L',1:'M',2:'Q','3':'H'}[self.eclevel]
+        
+        svg_begin = '''
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="%d" height="%d" version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+ <desc>QR Code (version=%d, ecl=%s)</desc>
+ <defs>
+  <rect id="m" width="1" height="1" fill="%s"/>
+ </defs>
+ <rect x="0" y="0" fill="%s" width="%d" height="%d"/>
+ <g transform="translate(%d, %d) scale(%d)">
+        ''' % (w,h, ver,ecl, on,off, w,h, 0,0, scale)
+        
+        svg_end = '''
+ </g>
+</svg>
+        '''
+        
+        svg_str = svg_begin
+        for r in range(self.size):
+            for c in range(self.size):
+                if self.matrix[r,c] == 1:
+                    svg_str += '''
+  <use xlink:href="#m" x="%d" y="%d"/>''' % (c,r)
+        svg_str += svg_end
+        
+        return svg_str
 
         
 # helper
