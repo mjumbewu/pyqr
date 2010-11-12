@@ -1,6 +1,6 @@
 # Copyright Hans Christian v. Stockhausen, 2010 
 
-import matrix, ffield, Image
+import matrix, ffield
 
 # Encoding mode, error correction and masking constants
 QR_MODE_NUM, QR_MODE_AN, QR_MODE_8, QR_MODE_KANJI = 0, 1, 2, 3
@@ -389,18 +389,33 @@ class QRCode(object):
         return s
 
     def to_image(self, module_width=6, on=0x008000, off=0xffffff):
+        import Image
         s = self.size
         img = Image.new('RGB', (s, s), off)
         img.putdata([on if x==1 else off for x in self.matrix.to_list()])
         return img.resize((module_width*s, module_width*s))
     
-    def to_svg(self, scale=6, on='black', off='white'):
-        w = h = self.size
+    def to_png(self, module_width=6, on=[0x00,0x80,0x00,0xff], off=[0xff,0xff,0xff,0xff]):
+        # This uses the PNGCanvas library.  This will have to go eventually, as
+        # it's licensed CC Attribution-NonCommercial-NoDerivs. The relevant bit
+        # there is NonCommercial."""
+        import pngcanvas
+        width = height = module_width * self.size
+        png = pngcanvas.PNGCanvas(width, height, off, on)
+        for r in range(self.size):
+            for c in range(self.size):
+                if self.matrix[r,c] == 1:
+                    png.filledRectangle(
+                        c*module_width,         r*module_width,
+                        (c+1)*module_width - 1, (r+1)*module_width - 1)
+        return png.dump()
+    
+    def to_svg(self, scale=6, on='green', off='white'):
+        w = h = self.size*scale
         ver = self.version
         ecl = {0:'L',1:'M',2:'Q','3':'H'}[self.eclevel]
         
-        svg_begin = '''
-<?xml version="1.0" standalone="no"?>
+        svg_begin = '''<?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="%d" height="%d" version="1.1"
