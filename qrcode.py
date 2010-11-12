@@ -395,12 +395,12 @@ class QRCode(object):
         img.putdata([on if x==1 else off for x in self.matrix.to_list()])
         return img.resize((module_width*s, module_width*s))
     
-    def to_png(self, module_width=6, on=[0x00,0x80,0x00,0xff], off=[0xff,0xff,0xff,0xff]):
+    def to_png(self, module_width=6, on=[0x00,0x00,0x00,0xff], off=[0xff,0xff,0xff,0xff]):
         # This uses the PNGCanvas library.  This will have to go eventually, as
         # it's licensed CC Attribution-NonCommercial-NoDerivs. The relevant bit
         # there is NonCommercial."""
         import pngcanvas
-        width = height = module_width * self.size
+        width = height = int(module_width * self.size)
         png = pngcanvas.PNGCanvas(width, height, off, on)
         for r in range(self.size):
             for c in range(self.size):
@@ -410,7 +410,7 @@ class QRCode(object):
                         (c+1)*module_width - 1, (r+1)*module_width - 1)
         return png.dump()
     
-    def to_svg(self, scale=6, on='green', off='white'):
+    def to_svg(self, scale=6, on='black', off='white'):
         w = h = self.size*scale
         ver = self.version
         ecl = {0:'L',1:'M',2:'Q','3':'H'}[self.eclevel]
@@ -426,7 +426,7 @@ class QRCode(object):
   <rect id="m" width="1" height="1" fill="%s"/>
  </defs>
  <rect x="0" y="0" fill="%s" width="%d" height="%d"/>
- <g transform="translate(%d, %d) scale(%d)">
+ <g transform="translate(%s, %s) scale(%s)">
         ''' % (w,h, ver,ecl, on,off, w,h, 0,0, scale)
         
         svg_end = '''
